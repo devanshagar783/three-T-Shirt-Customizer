@@ -9,10 +9,6 @@ export const EditorTabs = [
     name: "filepicker",
     icon: fileIcon,
   },
-  {
-    name: "aipicker",
-    icon: ai,
-  },
 ];
 
 export const FilterTabs = [
@@ -28,11 +24,11 @@ export const FilterTabs = [
 
 export const DecalTypes = {
   logo: {
-    stateProperty: "logoDecal",
+    stateProperty: "logo",
     filterTab: "logoShirt",
   },
   full: {
-    stateProperty: "fullDecal",
+    stateProperty: "full",
     filterTab: "stylishShirt",
   },
 };

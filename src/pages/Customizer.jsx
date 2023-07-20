@@ -4,21 +4,18 @@ import { useSnapshot } from "valtio";
 import state from "../store";
 import { slideAnimation, fadeAnimation } from "../config/motion";
 import { EditorTabs, DecalTypes, FilterTabs } from "../config/constants";
-import config from "../config/config";
 import {
-    AIPicker,
     ColorPicker,
     CustomButton,
     FilePicker,
     Tab,
 } from "../components";
+import { reader } from "../config/helpers";
 
 const Customizer = () => {
     const snap = useSnapshot(state);
 
     const [file, setFile] = useState("");
-    const [promt, setPromt] = useState("");
-    const [generatingImage, setGeneratingImage] = useState(false);
     const [activeEditorTab, setActiveEditorTab] = useState("");
     const [activeFilterTab, setActiveFilterTab] = useState({
         logoShirt: true,
@@ -30,12 +27,51 @@ const Customizer = () => {
             case "colorpicker":
                 return <ColorPicker />;
             case "filepicker":
-                return <FilePicker />;
-            case "aipicker":
-                return <AIPicker />;
+                return (
+                    <FilePicker
+                        file={file}
+                        setFile={setFile}
+                        readFile={readFile}
+                    />
+                );
             default:
                 return null;
         }
+    };
+
+    const handleDecals = (type, result) => {
+        const decalType = DecalTypes[type];
+        state[decalType.stateProperty] = result;
+        if (!activeFilterTab[decalType.filterTab]) {
+            handleActiveFilterTab(decalType.filterTab);
+        }
+    };
+
+    const handleActiveFilterTab = (tabName) => {
+        switch (tabName) {
+            case "logoShirt":
+                state.isLogoTexture = !activeFilterTab[tabName];
+                break;
+            case "stylishShirt":
+                state.isFullTexture = !activeFilterTab[tabName];
+                break;
+            default:
+                state.isLogoTexture = true;
+                state.isFullTexture = false;
+        }
+        setActiveFilterTab((prev) => {
+            return {
+                ...prev,
+                [tabName]: !prev[tabName],
+            };
+        });
+    };
+
+    const readFile = (type) => {
+        reader(file).then((result) => {
+            handleDecals(type, result);
+            setActiveEditorTab("");
+        });
     };
 
     return (
@@ -54,7 +90,7 @@ const Customizer = () => {
                                         key={tab.name || ""}
                                         tab={tab}
                                         handleClick={() => {
-                                            setActiveEditorTab(tab.name);
+                                            setActiveEditorTab((prev) => (!prev || prev != tab.name) ? tab.name : "");
                                         }}
                                     ></Tab>
                                 ))}
@@ -83,9 +119,11 @@ const Customizer = () => {
                             <Tab
                                 key={tab.name}
                                 tab={tab}
-                                handleClick={() => {}}
+                                handleClick={() => {
+                                    handleActiveFilterTab(tab.name);
+                                }}
                                 isFilterTab
-                                isActiveTab=""
+                                isActiveTab={activeFilterTab[tab.name]}
                             />
                         ))}
                     </motion.div>
