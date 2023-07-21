@@ -7,7 +7,7 @@ import { easing } from "maath";
 
 const Shirt = () => {
     const snap = useSnapshot(state);
-    const { nodes, materials } = useGLTF("/shirt_baked.glb");
+    const { nodes, materials } = useGLTF("/three-T-Shirt-Customizer/shirt_baked.glb");
 
     const logoTexture = useTexture(snap.logo);
     const fullTexture = useTexture(snap.full);
